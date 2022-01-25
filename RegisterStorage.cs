@@ -17,6 +17,7 @@ namespace Core.Pool
         
         public RegisterStorage(MonoBehaviour sender, Transform storageLocation)
         {
+            _sender = sender;
             _storageLocation = storageLocation;
             _storages = new Dictionary<TSignature, Storage<TObject, TObjectTools, TSignature>>();
         }
