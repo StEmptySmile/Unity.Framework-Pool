@@ -21,14 +21,15 @@ namespace Core.Pool
             _storageLocation = storageLocation;
             _storages = new Dictionary<TSignature, Storage<TObject, TObjectTools, TSignature>>();
         }
-        public void SendRegister(Storage<TObject, TObjectTools, TSignature>.Package package)
+        public void SendRegister(Storage<TObject, TObjectTools, TSignature>.Package package, int numberObjsChangeFrame = 1)
         {
             if(_storages.ContainsKey(package.Signature) == false)
             {
                 Storage<TObject, TObjectTools, TSignature> storage = new Storage<TObject, TObjectTools, TSignature>(
                     _sender,
                     _storageLocation,
-                    package
+                    package,
+                    numberObjsChangeFrame
                 );
                 _storages.Add(package.Signature, storage);
             }

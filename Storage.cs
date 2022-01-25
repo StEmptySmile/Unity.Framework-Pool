@@ -13,17 +13,18 @@ namespace Core.Pool
         public IReadOnlyList<TObject> Objects => _objects;
         public TSignature Signature { get; private set; }
 
-        private const int NUMBER_OBJS_CHANGE_FRAME = 5;
-
+        private readonly int _numberObjsChangeFrame;
         private readonly Transform _storageLocation;
         private readonly Queue<TObject> _freeForUse;
         private readonly List<TObject> _objects;
 
         public Storage(MonoBehaviour sender,
                         Transform storageLocation, 
-                        Package package)
+                        Package package,
+                        int numberObjsChangeFrame)
         {
             Signature = package.Signature;
+            _numberObjsChangeFrame = numberObjsChangeFrame;
             _storageLocation = storageLocation;
             _freeForUse = new Queue<TObject>();
             _objects = new List<TObject>();
@@ -40,7 +41,7 @@ namespace Core.Pool
             uint amountForStorage = package.AmountForStorage;
             while (amountForStorage > 0)
             {
-                for(int number = 0; number < NUMBER_OBJS_CHANGE_FRAME; number++)
+                for(int number = 0; number < _numberObjsChangeFrame; number++)
                 {
                     if(amountForStorage <= 0)
                         break;
