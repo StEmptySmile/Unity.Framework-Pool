@@ -38,20 +38,17 @@ namespace Core.Pool
         }
         private System.Collections.IEnumerator AllCreate(Transform storageLocation, Package package)
         {
-            uint amountForStorage = package.AmountForStorage;
-            while (amountForStorage > 0)
+            uint numberOrders = package.AmountForStorage;
+            while (numberOrders > 0)
             {
                 for(int number = 0; number < _numberObjsChangeFrame; number++)
                 {
-                    if(amountForStorage <= 0)
-                        break;
-
                     TObject obj = Create(storageLocation, package.Signature, package.Distributor);
-                    obj.name += amountForStorage;
+                    obj.name += numberOrders;
 
                     _freeForUse.Enqueue(obj);
                     _objects.Add(obj);
-                    amountForStorage--;
+                    numberOrders--;
                 }
                 yield return null;
             }
@@ -72,9 +69,15 @@ namespace Core.Pool
 
         [System.Serializable] public struct Package
         {
-            public TSignature Signature;
-            public uint AmountForStorage;
-            public System.Func<TObject, TObjectTools> Distributor;
+            public TSignature Signature { get; private set; }
+            public uint AmountForStorage { get; private set; } 
+            public System.Func<TObject, TObjectTools> Distributor { get; private set; }
+            public Package(TSignature signature, uint amountForStorage, System.Func<TObject, TObjectTools> distributor)
+            {
+                Signature = signature;
+                AmountForStorage = amountForStorage;
+                Distributor = distributor;
+            }
         }
     }
 }
