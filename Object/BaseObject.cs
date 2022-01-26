@@ -13,13 +13,11 @@ namespace Core.Pool.Object
             where TObject : BaseObject<TSignature, TTools>
         {
             TObject answer = Instantiate(prefab, storageLocation);
+            answer.Signature = signature;
             answer.Construct(signature, distributor.Invoke(answer));
             return answer;
         }
-        protected virtual void Construct(TSignature signature, TTools tools)
-        {
-            Signature = signature;
-        }
+        protected virtual void Construct(TSignature signature, TTools tools) { }
         public virtual void Return()
         {
             OnReturn?.Invoke();
