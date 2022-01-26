@@ -10,7 +10,10 @@ namespace Core.Pool
         where TSignature : Template<TObject>
     {
         public IReadOnlyDictionary<TSignature, Storage<TObject, TObjectTools, TSignature>> Storages => _storages;
-        
+        public event System.Action OnEndAllCreated;
+
+        private int _amountStoragesStillCreated = 0;
+
         private readonly MonoBehaviour _sender;
         private readonly Transform _storageLocation; 
         private readonly Dictionary<TSignature, Storage<TObject, TObjectTools, TSignature>> _storages;
@@ -31,8 +34,18 @@ namespace Core.Pool
                     package,
                     numberObjsChangeFrame
                 );
+                
+                _amountStoragesStillCreated++;
+                storage.OnEndAllCreated += StorageHasCompletedCreating;
+
                 _storages.Add(package.Signature, storage);
             }
+        }
+        private void StorageHasCompletedCreating()
+        {
+            _amountStoragesStillCreated--;
+            if(_amountStoragesStillCreated <= 0)
+                OnEndAllCreated?.Invoke();
         }
     }
 }
