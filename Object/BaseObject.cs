@@ -2,25 +2,25 @@ using UnityEngine;
 
 namespace Core.Pool.Object
 {
-    public abstract class BaseObject<TSignature, TTools> : MonoBehaviour, IRenewable
-        where TSignature : ScriptableObject
-        where TTools : ToolsObject
+    public abstract class BaseObject : MonoBehaviour
     {
-        public TSignature Signature { get; private set; }
+        public IObjectTools Tools { get; protected set; }
+        public IObjectTemplate<BaseObject> Template { get; protected set; }
         public event System.Action OnReturn;
 
-        public static TObject Create<TObject>(TObject prefab, Transform storageLocation, TSignature signature, System.Func<TObject, TTools> distributor)
-            where TObject : BaseObject<TSignature, TTools>
+        protected virtual void Construct() { }
+        public static TObject Create<TObject, TTools>(IObjectTemplate<TObject> template, Transform storageLocation, System.Func<TObject, TTools> distributor)
+            where TObject : BaseObject
         {
-            TObject answer = Instantiate(prefab, storageLocation);
-            answer.Signature = signature;
-            answer.Construct(signature, distributor.Invoke(answer));
+            TObject answer = Instantiate(template.Object, storageLocation);
+            answer.Template = template as IObjectTemplate<BaseObject>;
+            answer.Tools = distributor.Invoke(answer) as IObjectTools;
+            answer.Construct();
             return answer;
         }
-        protected virtual void Construct(TSignature signature, TTools tools) { }
-        public virtual void Return()
+        public void Return()
         {
             OnReturn?.Invoke();
         }
-    }   
+    }
 }
