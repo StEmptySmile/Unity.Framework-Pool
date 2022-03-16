@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace Core.Pool
 {
@@ -7,11 +6,12 @@ namespace Core.Pool
 
     public interface ISpawner
     {
+        public bool IsObjectsAreCreated { get; }
         public event System.Action OnEndAllCreated;
         public int AmountForStorage { get; } 
     }
     public interface ISpawnedObject<TObject, TObjectTools, TObjectTemplate> : ISpawner
-        where TObject : BaseObject
+        where TObject : MonoPoolObject<TObjectTools, TObjectTemplate>
         where TObjectTools : IObjectTools
         where TObjectTemplate : IObjectTemplate<TObject>
     {
@@ -19,7 +19,7 @@ namespace Core.Pool
         public Storage<TObject, TObjectTools, TObjectTemplate> Storage { get; }  
     }
     public interface ISpawnedObjects<TObject, TObjectTools, TObjectTemplate> : ISpawner
-        where TObject : BaseObject
+        where TObject : MonoPoolObject<TObjectTools, TObjectTemplate>
         where TObjectTools : IObjectTools
         where TObjectTemplate : IObjectTemplate<TObject>
     {
