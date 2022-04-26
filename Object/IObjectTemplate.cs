@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Core.Pool.Object
+namespace ESUnity.Pool.Object
 {
     public interface IObjectTemplate<out TObject> 
         where TObject : MonoBehaviour

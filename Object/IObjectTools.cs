@@ -1,4 +1,4 @@
-namespace Core.Pool.Object
+namespace ESUnity.Pool.Object
 {
     public interface IObjectTools { }
 }

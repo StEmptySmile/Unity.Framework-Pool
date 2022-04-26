@@ -1,29 +1,11 @@
-using System.Collections.Generic;
+using UnityEngine;
 
-namespace Core.Pool
+namespace ESUnity.Pool
 {
-    using Object;
-
-    public interface ISpawner
+    public interface ISpawner<TTemplate>
     {
-        public bool IsObjectsAreCreated { get; }
-        public event System.Action OnEndAllCreated;
+        public Transform StorageLocation { get; }
+        public TTemplate ObjectInstance { get; }
         public int AmountForStorage { get; } 
-    }
-    public interface ISpawnedObject<TObject, TObjectTools, TObjectTemplate> : ISpawner
-        where TObject : MonoPoolObject<TObjectTools, TObjectTemplate>
-        where TObjectTools : IObjectTools
-        where TObjectTemplate : IObjectTemplate<TObject>
-    {
-        public TObjectTemplate Template { get; }
-        public Storage<TObject, TObjectTools, TObjectTemplate> Storage { get; }  
-    }
-    public interface ISpawnedObjects<TObject, TObjectTools, TObjectTemplate> : ISpawner
-        where TObject : MonoPoolObject<TObjectTools, TObjectTemplate>
-        where TObjectTools : IObjectTools
-        where TObjectTemplate : IObjectTemplate<TObject>
-    {
-        public IReadOnlyList<TObjectTemplate> Templates { get; }
-        public IReadOnlyDictionary<TObjectTemplate, Storage<TObject, TObjectTools, TObjectTemplate>> Storages { get; }  
     }
 }

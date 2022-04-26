@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Core.Pool.Object
+namespace ESUnity.Pool.Object
 {
     public abstract class MonoPoolObject<TTools, TTemplate> : MonoBehaviour 
         where TTools : IObjectTools

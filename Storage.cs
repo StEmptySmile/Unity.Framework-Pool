@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Collections;
 using UnityEngine;
 
-namespace Core.Pool
+namespace ESUnity.Pool
 {
     using Object;
 
@@ -11,23 +11,17 @@ namespace Core.Pool
         where TObjectTools : IObjectTools 
         where TObjectTemplate : IObjectTemplate<TObject>
     {
-        public event System.Action OnEndAllCreated;
+        public event System.Action OnAllObjectsAreCreated;
+        public bool IsObjectsAreCreated { get; private set; } = false;
+        public ISpawner<TObjectTemplate> Spawner => _package.Spawner;
 
-        public Transform Location => _location;
-        public TObjectTemplate Template => _package.Template;
-        public ISpawner Spawner => _package.Spawner;
-
-        private readonly Transform _location;
         private readonly Queue<TObject> _freeForUse;
         private readonly List<TObject> _objects;
         private readonly MonoBehaviour _sender;
         private readonly Package _package;
         
-        public Storage(MonoBehaviour sender,
-                        Transform storageLocation, 
-                        Package package)
+        public Storage(MonoBehaviour sender, Package package)
         {
-            _location = storageLocation;
             _freeForUse = new Queue<TObject>();
             _objects = new List<TObject>();
             _sender = sender;
@@ -35,7 +29,7 @@ namespace Core.Pool
         }
         public void Execute()
         {
-            _sender.StartCoroutine(AllCreate(_location, _package));
+            _sender.StartCoroutine(AllCreate(Spawner.StorageLocation, _package));
         }
         public TObject Receive()
         {
@@ -45,20 +39,24 @@ namespace Core.Pool
         private IEnumerator AllCreate(Transform storageLocation, Package package)
         {
             int numberOrders = package.Spawner.AmountForStorage;
+            
             while (numberOrders > 0)
             {
-                for(int number = 0; number < package.NumberObjsChangeFrame; number++)
+                for(int number = 0; number < package.NumberObjectsPerFrame; number++)
                 {
-                    TObject obj = Create(storageLocation, package.Template, package.Distributor);
+                    TObject obj = Create(storageLocation, package.Spawner.ObjectInstance, package.Distributor);
                     obj.name += numberOrders;
 
                     _freeForUse.Enqueue(obj);
                     _objects.Add(obj);
+            
                     numberOrders--;
                 }
                 yield return null;
             }
-            OnEndAllCreated?.Invoke();
+
+            OnAllObjectsAreCreated?.Invoke();
+            IsObjectsAreCreated = true;
         }
         private TObject Create(Transform storageLocation, TObjectTemplate template, System.Func<TObject, TObjectTools> distributor)
         {
@@ -69,23 +67,21 @@ namespace Core.Pool
         }
         private void Returning(TObject obj)
         {
-            obj.transform.parent = _location;
+            obj.transform.parent = Spawner.StorageLocation;
             _freeForUse.Enqueue(obj);
         }
 
         [System.Serializable] public struct Package
         {
-            public ISpawner Spawner { get; private set; }
-            public TObjectTemplate Template { get; private set; }
+            public ISpawner<TObjectTemplate> Spawner { get; private set; }
             public System.Func<TObject, TObjectTools> Distributor { get; private set; }
-            public int NumberObjsChangeFrame { get; private set; }
+            public int NumberObjectsPerFrame { get; private set; }
             
-            public Package(ISpawner spawner, TObjectTemplate template, System.Func<TObject, TObjectTools> distributor, int numberObjsChangeFrame)
+            public Package(ISpawner<TObjectTemplate> spawner, System.Func<TObject, TObjectTools> distributor, int numberObjectsPerFrame)
             {
                 Spawner = spawner;
-                Template = template;
                 Distributor = distributor;
-                NumberObjsChangeFrame = numberObjsChangeFrame;
+                NumberObjectsPerFrame = numberObjectsPerFrame;
             }
         }
     }
